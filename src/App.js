@@ -8,6 +8,7 @@ import "react-phone-input-2/lib/style.css";
 import { auth } from "./firebase.config";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { toast, Toaster } from "react-hot-toast";
+import { useRouter } from "next/router";
 
 const App = () => {
   const [otp, setOtp] = useState("");
@@ -15,7 +16,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [user, setUser] = useState(null);
-
+  const router = useRouter();
   function onCaptchVerify() {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
@@ -67,6 +68,9 @@ const App = () => {
         setLoading(false);
       });
   }
+  function onVerificationSuccess() {
+    router.push(`https://www.airtaska.com/settings/mobile-number/${ph}`);
+  }
 
   return (
     <div className="mx-auto max-w-[1280px] px-3 sm:px-6 md:px-16 bg-gray-100 min-h-screen">
@@ -80,9 +84,20 @@ const App = () => {
           <Toaster toastOptions={{ duration: 4000 }} />
           <div id="recaptcha-container"></div>
           {user ? (
-            <h2 className="text-center text-blue-950 font-medium text-2xl">
-              👍Login Success
-            </h2>
+            <>
+              <h2 className="text-center text-blue-950 font-medium text-2xl">
+                Phone Verification Success
+              </h2>
+              <button
+                onClick={onVerificationSuccess}
+                className="bg-green-600 w-full flex gap-1 items-center justify-center py-2.5 text-blue-950 rounded"
+              >
+                {loading && (
+                  <CgSpinner size={20} className="mt-1 animate-spin" />
+                )}
+                <span className="text-white">Send code via SMS</span>
+              </button>
+            </>
           ) : (
             <div className="w-80 flex flex-col gap-4 rounded-lg p-4">
               {showOTP ? (
